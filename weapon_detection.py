@@ -2,16 +2,22 @@ import cv2
 import os
 import datetime
 import time
+from pathlib import Path
 from ultralytics import YOLO
 # ==============================
 # MODEL
 # ==============================
-MODEL_PATH = "runs/detect/train/weights/best.pt"
-model = YOLO(MODEL_PATH)
+MODEL_PATH = Path(__file__).resolve().parent / "models" / "weapon_detection_best.pt"
+if not MODEL_PATH.is_file():
+    raise SystemExit(f"Weapon detection weights are missing: {MODEL_PATH}")
+model = YOLO(str(MODEL_PATH))
 # ==============================
 # CAMERA
 # ==============================
-cap = cv2.VideoCapture(0,cv2.CAP_DSHOW)
+cap = cv2.VideoCapture(0)
+if not cap.isOpened():
+    cap.release()
+    raise SystemExit("Could not open the default camera. Check that it is connected and available.")
 FRAME_WIDTH = 640
 FRAME_HEIGHT = 480
 # HEADER HEIGHT (reserved area)
